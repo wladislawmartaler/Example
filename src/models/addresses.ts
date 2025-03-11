@@ -1,8 +1,8 @@
-import { pgTable, serial, text, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer } from 'drizzle-orm/pg-core';
 import { usersTable } from './users';
 
 export const addressesTable = pgTable('addresses', {
-  id: serial('id').primaryKey(),
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: integer('user_id').references(() => usersTable.id).notNull(), // Verknüpfung zum User
   street: text('street').notNull(),
   city: text('city').notNull(),

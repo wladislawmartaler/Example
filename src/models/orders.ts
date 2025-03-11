@@ -1,8 +1,8 @@
-import { pgTable, serial, integer, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, integer, timestamp } from 'drizzle-orm/pg-core';
 import { usersTable } from './users';
 
 export const ordersTable = pgTable('orders', {
-  id: serial('id').primaryKey(),
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: integer('user_id').references(() => usersTable.id).notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 });
