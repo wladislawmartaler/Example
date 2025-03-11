@@ -1,10 +1,10 @@
 import { pgTable, serial, integer } from 'drizzle-orm/pg-core';
-import { orders } from './orders';
-import { products } from './products';
+import { ordersTable } from './orders';
+import { productsTable } from './products';
 
-export const orderPositions = pgTable('order_positions', {
+export const ordersPositionsTable = pgTable('order_positions', {
   id: serial('id').primaryKey(),
-  orderId: integer('order_id').references(() => orders.id).notNull(),
-  productId: integer('product_id').references(() => products.id).notNull(),
+  orderId: integer('order_id').references(() => ordersTable.id).notNull(),
+  productId: integer('product_id').references(() => productsTable.id).notNull(),
   quantity: integer('quantity').notNull(),
 });

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { db } from '../db/config';
-import { orders, orderPositions, products } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { ordersTable, ordersPositionsTable, productsTable } from '../db/schema';
+import { eq, and } from 'drizzle-orm';
 
 export const ordersRouter = new Hono();
 
@@ -11,8 +11,8 @@ ordersRouter.get('/:id/orders', async (c) => {
   try {
     const userOrders = await db
       .select()
-      .from(orders)
-      .where(eq(orders.userId, userId));
+      .from(ordersTable)
+      .where(eq(ordersTable.userId, userId));
 
     return c.json(userOrders);
   } catch (error) {
@@ -24,7 +24,7 @@ ordersRouter.get('/:id/orders', async (c) => {
 ordersRouter.post('/:id/orders', async (c) => {
   const userId = Number(c.req.param('id'));
   try {
-    const newOrder = await db.insert(orders).values({ userId }).returning();
+    const newOrder = await db.insert(ordersTable).values({ userId }).returning();
     return c.json(newOrder[0], 201);
   } catch (error) {
     return c.json({ error: 'Fehler beim Erstellen der Bestellung' }, 500);
@@ -37,17 +37,17 @@ ordersRouter.get('/:userId/orders/:orderId', async (c) => {
   try {
     const orderDetails = await db
       .select({
-        orderId: orders.id,
-        createdAt: orders.createdAt,
-        productId: orderPositions.productId,
-        quantity: orderPositions.quantity,
-        productName: products.name,
-        price: products.price,
+        orderId: ordersTable.id,
+        createdAt: ordersTable.createdAt,
+        productId: ordersPositionsTable.productId,
+        quantity: ordersPositionsTable.quantity,
+        productName: productsTable.name,
+        price: productsTable.price,
       })
-      .from(orders)
-      .leftJoin(orderPositions, eq(orderPositions.orderId, orders.id))
-      .leftJoin(products, eq(orderPositions.productId, products.id))
-      .where(eq(orders.id, orderId));
+      .from(ordersTable)
+      .leftJoin(ordersPositionsTable, eq(ordersPositionsTable.orderId, ordersTable.id))
+      .leftJoin(productsTable, eq(ordersPositionsTable.productId, productsTable.id))
+      .where(eq(ordersTable.id, orderId));
 
     if (!orderDetails.length) {
       return c.json({ error: 'Bestellung nicht gefunden oder keine Produkte enthalten' }, 404);
@@ -65,7 +65,7 @@ ordersRouter.post('/:userId/orders/:orderId/products', async (c) => {
   try {
     const body = await c.req.json();
     const newOrderPosition = await db
-      .insert(orderPositions)
+      .insert(ordersPositionsTable)
       .values({
         orderId,
         productId: body.productId,
@@ -85,9 +85,8 @@ ordersRouter.delete('/:userId/orders/:orderId/products/:productId', async (c) =>
   const productId = Number(c.req.param('productId'));
   try {
     const deletedItem = await db
-      .delete(orderPositions)
-      .where(eq(orderPositions.orderId, orderId))
-      .where(eq(orderPositions.productId, productId))
+      .delete(ordersPositionsTable)
+      .where(and(eq(ordersPositionsTable.orderId, orderId), eq(ordersPositionsTable.productId, productId)))
       .returning();
 
     if (!deletedItem.length) {
