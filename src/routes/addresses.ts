@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { db } from '../db/config';
 import { addressesTable } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export const addressRouter = new Hono();
 
@@ -57,8 +57,7 @@ addressRouter.put('/:userId/addresses/:addressId', async (c) => {
         zipCode: body.zipCode,
         country: body.country,
       })
-      .where(eq(addressesTable.id, addressId))
-      .where(eq(addressesTable.userId, userId))
+      .where(and(eq(addressesTable.userId, userId), eq(addressesTable.id, addressId)))
       .returning();
 
     if (!updatedAddress.length) {
@@ -79,8 +78,7 @@ addressRouter.delete('/:userId/addresses/:addressId', async (c) => {
   try {
     const deletedAddress = await db
       .delete(addressesTable)
-      .where(eq(addressesTable.id, addressId))
-      .where(eq(addressesTable.userId, userId))
+      .where(and(eq(addressesTable.id, addressId), eq(addressesTable.userId, userId)))
       .returning();
 
     if (!deletedAddress.length) {
