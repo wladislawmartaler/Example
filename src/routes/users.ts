@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { db } from '../db/config';
 import { usersTable } from '../models/users';
 import { eq } from 'drizzle-orm';
+import { addressRouter } from './addresses'; // Adress-Router importieren
+import {ordersRouter } from './orders';
 
 const userRouter = new Hono();
 
@@ -81,5 +83,8 @@ userRouter.delete('/:id', async (c) => {
     return c.json({ error: 'Fehler beim Löschen des Benutzers' }, 500);
   }
 });
+
+userRouter.route('/', addressRouter);
+userRouter.route('/', ordersRouter);
 
 export { userRouter };
