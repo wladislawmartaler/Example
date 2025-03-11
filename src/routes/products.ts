@@ -5,15 +5,35 @@ import { eq } from 'drizzle-orm';
 
 export const productRouter = new Hono();
 
-// 📌 Alle Produkte abrufen (GET /products)
+// 📌 Alle Produkte mit Pagination abrufen (GET /products?limit=10&page=2)
 productRouter.get('/', async (c) => {
-  try {
-    const allProducts = await db.select().from(productsTable);
-    return c.json(allProducts);
-  } catch (error) {
-    return c.json({ error: 'Fehler beim Abrufen der Produkte' }, 500);
-  }
-});
+    const limit = Number(c.req.query('limit')) || 10; // Standard: 10 Produkte pro Seite
+    const page = Number(c.req.query('page')) || 1; // Standard: Seite 1
+    const offset = (page - 1) * limit; // Offset für Pagination
+  
+    try {
+      // Alle Produkte mit Limit + Offset abrufen
+      const allProducts = await db
+        .select()
+        .from(productsTable)
+        .limit(limit)
+        .offset(offset);
+  
+      // Gesamtanzahl der Produkte für Pagination berechnen
+      const totalProducts = await db.select({ count: productsTable.id }).from(productsTable);
+      const totalCount = totalProducts[0]?.count || 0;
+  
+      return c.json({
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+        totalProducts: totalCount,
+        products: allProducts,
+      });
+    } catch (error) {
+      return c.json({ error: 'Fehler beim Abrufen der Produkte' }, 500);
+    }
+  });
+  
 
 // 📌 Einzelnes Produkt abrufen (GET /products/:id)
 productRouter.get('/:id', async (c) => {
