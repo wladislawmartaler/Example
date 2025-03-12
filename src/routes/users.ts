@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { db } from '../db/config';
+import { db } from '../db/client';
 import { usersTable } from '../models/users';
 import { eq } from 'drizzle-orm';
 import { addressRouter } from './addresses'; // Adress-Router importieren
@@ -7,7 +7,6 @@ import {ordersRouter } from './orders';
 
 const userRouter = new Hono();
 
-// 📌 Alle Benutzer abrufen (GET /users)
 userRouter.get('/', async (c) => {
   try {
     const allUsers = await db.select().from(usersTable);
@@ -17,7 +16,6 @@ userRouter.get('/', async (c) => {
   }
 });
 
-// 📌 Einzelnen Benutzer abrufen (GET /users/:id)
 userRouter.get('/:id', async (c) => {
   const id = Number(c.req.param('id'));
   try {
@@ -31,14 +29,13 @@ userRouter.get('/:id', async (c) => {
   }
 });
 
-// 📌 Neuen Benutzer erstellen (POST /users)
 userRouter.post('/', async (c) => {
   try {
     const body = await c.req.json();
     const newUser = await db.insert(usersTable).values({
       username: body.username,
       email: body.email,
-      passwordHash: body.passwordHash, // 🔒 Hashing kommt später
+      passwordHash: body.passwordHash,
       role: body.role || 'customer',
       isVIP: body.isVIP || false
     }).returning();
@@ -48,7 +45,6 @@ userRouter.post('/', async (c) => {
   }
 });
 
-// 📌 Benutzer aktualisieren (PUT /users/:id)
 userRouter.put('/:id', async (c) => {
   const id = Number(c.req.param('id'));
   try {
@@ -68,7 +64,6 @@ userRouter.put('/:id', async (c) => {
   }
 });
 
-// 📌 Benutzer löschen (DELETE /users/:id)
 userRouter.delete('/:id', async (c) => {
   const id = Number(c.req.param('id'));
   try {

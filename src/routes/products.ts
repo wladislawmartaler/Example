@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import { db } from '../db/config';
+import { db } from '../db/client';
 import { productsTable } from '../db/schema';
 import { eq } from 'drizzle-orm';
 
 export const productRouter = new Hono();
 
-// 📌 Alle Produkte mit Pagination abrufen (GET /products?limit=10&page=2)
+
 productRouter.get('/', async (c) => {
     const limit = Number(c.req.query('limit')) || 10; // Standard: 10 Produkte pro Seite
     const page = Number(c.req.query('page')) || 1; // Standard: Seite 1
@@ -34,8 +34,6 @@ productRouter.get('/', async (c) => {
     }
   });
   
-
-// 📌 Einzelnes Produkt abrufen (GET /products/:id)
 productRouter.get('/:id', async (c) => {
   const id = Number(c.req.param('id'));
   try {
@@ -49,7 +47,6 @@ productRouter.get('/:id', async (c) => {
   }
 });
 
-// 📌 Neues Produkt erstellen (POST /products)
 productRouter.post('/', async (c) => {
   try {
     const body = await c.req.json();
@@ -69,7 +66,6 @@ productRouter.post('/', async (c) => {
   }
 });
 
-// 📌 Produkt aktualisieren (PUT /products/:id)
 productRouter.put('/:id', async (c) => {
   const id = Number(c.req.param('id'));
   try {
@@ -95,7 +91,6 @@ productRouter.put('/:id', async (c) => {
   }
 });
 
-// 📌 Produkt löschen (DELETE /products/:id)
 productRouter.delete('/:id', async (c) => {
   const id = Number(c.req.param('id'));
   try {

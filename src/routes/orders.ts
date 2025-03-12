@@ -1,11 +1,10 @@
 import { Hono } from 'hono';
-import { db } from '../db/config';
+import { db } from '../db/client';
 import { ordersTable, ordersPositionsTable, productsTable } from '../db/schema';
 import { eq, and } from 'drizzle-orm';
 
 export const ordersRouter = new Hono();
 
-// 📌 Alle Bestellungen eines Users abrufen (GET /users/:id/orders)
 ordersRouter.get('/:id/orders', async (c) => {
   const userId = Number(c.req.param('id'));
   try {
@@ -20,7 +19,6 @@ ordersRouter.get('/:id/orders', async (c) => {
   }
 });
 
-// 📌 Neue Bestellung für einen User anlegen (POST /users/:id/orders)
 ordersRouter.post('/:id/orders', async (c) => {
   const userId = Number(c.req.param('id'));
   try {
@@ -31,7 +29,6 @@ ordersRouter.post('/:id/orders', async (c) => {
   }
 });
 
-// 📌 Einzelne Bestellung abrufen mit Produkten (GET /users/:userId/orders/:orderId)
 ordersRouter.get('/:userId/orders/:orderId', async (c) => {
   const orderId = Number(c.req.param('orderId'));
   try {
@@ -59,7 +56,6 @@ ordersRouter.get('/:userId/orders/:orderId', async (c) => {
   }
 });
 
-// 📌 Produkt zu einer Bestellung hinzufügen (POST /users/:userId/orders/:orderId/products)
 ordersRouter.post('/:userId/orders/:orderId/products', async (c) => {
   const orderId = Number(c.req.param('orderId'));
   try {
@@ -79,7 +75,6 @@ ordersRouter.post('/:userId/orders/:orderId/products', async (c) => {
   }
 });
 
-// 📌 Produkt aus einer Bestellung entfernen (DELETE /users/:userId/orders/:orderId/products/:productId)
 ordersRouter.delete('/:userId/orders/:orderId/products/:productId', async (c) => {
   const orderId = Number(c.req.param('orderId'));
   const productId = Number(c.req.param('productId'));

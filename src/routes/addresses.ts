@@ -1,11 +1,10 @@
 import { Hono } from 'hono';
-import { db } from '../db/config';
+import { db } from '../db/client';
 import { addressesTable } from '../db/schema';
 import { eq, and } from 'drizzle-orm';
 
 export const addressRouter = new Hono();
 
-// 📌 Alle Adressen eines Users abrufen (GET /users/:id/addresses)
 addressRouter.get('/:id/addresses', async (c) => {
   const userId = Number(c.req.param('id'));
   try {
@@ -20,7 +19,6 @@ addressRouter.get('/:id/addresses', async (c) => {
   }
 });
 
-// 📌 Neue Adresse für einen User hinzufügen (POST /users/:id/addresses)
 addressRouter.post('/:id/addresses', async (c) => {
   const userId = Number(c.req.param('id'));
   try {
@@ -42,7 +40,6 @@ addressRouter.post('/:id/addresses', async (c) => {
   }
 });
 
-// 📌 Adresse eines Users aktualisieren (PUT /users/:userId/addresses/:addressId)
 addressRouter.put('/:userId/addresses/:addressId', async (c) => {
   const userId = Number(c.req.param('userId'));
   const addressId = Number(c.req.param('addressId'));
@@ -70,7 +67,6 @@ addressRouter.put('/:userId/addresses/:addressId', async (c) => {
   }
 });
 
-// 📌 Adresse eines Users löschen (DELETE /users/:userId/addresses/:addressId)
 addressRouter.delete('/:userId/addresses/:addressId', async (c) => {
   const userId = Number(c.req.param('userId'));
   const addressId = Number(c.req.param('addressId'));

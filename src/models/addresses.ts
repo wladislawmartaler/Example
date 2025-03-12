@@ -3,7 +3,7 @@ import { usersTable } from './users';
 
 export const addressesTable = pgTable('addresses', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  userId: integer('user_id').references(() => usersTable.id).notNull(), // Verknüpfung zum User
+  userId: integer('user_id').references(() => usersTable.id).notNull(),
   street: text('street').notNull(),
   city: text('city').notNull(),
   zipCode: text('zip_code').notNull(),
