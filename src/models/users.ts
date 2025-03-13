@@ -1,4 +1,5 @@
 import { pgTable, integer, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-zod';
 
 export const usersTable = pgTable('users', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -12,3 +13,8 @@ export const usersTable = pgTable('users', {
   isVIP: boolean('is_vip').default(false),
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+export type User = typeof usersTable.$inferSelect;
+export type NewUser = typeof usersTable.$inferInsert;
+
+export const NewUserSchema = createInsertSchema(usersTable);

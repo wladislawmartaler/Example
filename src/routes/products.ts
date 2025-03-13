@@ -57,6 +57,7 @@ productRouter.post('/', async (c) => {
         description: body.description,
         price: body.price,
         stock: body.stock,
+        imageUrl: "img"
       })
       .returning();
 
